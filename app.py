@@ -18,14 +18,16 @@ def load_model():
 model = load_model()
 
 # CIFAR-10 class names
-class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
-               'dog', 'frog', 'horse', 'ship', 'truck']
+class_names = [
+    'butterfly', 'cat', 'chicken', 'cow', 'dog',
+    'elephant', 'horse', 'ragno', 'sheep', 'squirrel'
+]
 
 # -------------------------------
 # UI
 # -------------------------------
 st.set_page_config(page_title="AI Image Classifier", layout="centered")
-st.title("🖼️ Image Classifier (CIFAR-10)")
+st.title("Multi Class Image Classifier by Debarshi (CNN)")
 st.write("Upload an image and the model will predict its class.")
 
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
