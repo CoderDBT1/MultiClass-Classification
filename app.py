@@ -24,6 +24,7 @@ class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
 # -------------------------------
 # UI
 # -------------------------------
+st.set_page_config(page_title="AI Image Classifier", layout="centered")
 st.title("🖼️ Image Classifier (CIFAR-10)")
 st.write("Upload an image and the model will predict its class.")
 
