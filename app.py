@@ -1,12 +1,45 @@
-# -------------------------------
-# Streamlit App for CIFAR-10 Classifier
-# -------------------------------
-
 import streamlit as st
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 from PIL import Image
+
+# -------------------------------
+# Page Config
+# -------------------------------
+st.set_page_config(
+    page_title="Animal Classifier",
+    page_icon="🧠",
+    layout="centered"
+)
+
+# -------------------------------
+# Custom CSS
+# -------------------------------
+st.markdown("""
+<style>
+.main {
+    background-color: #0e1117;
+}
+.title {
+    text-align: center;
+    font-size: 36px;
+    font-weight: bold;
+    color: #ffffff;
+}
+.subtitle {
+    text-align: center;
+    color: #aaaaaa;
+    margin-bottom: 30px;
+}
+.card {
+    padding: 20px;
+    border-radius: 15px;
+    background-color: #161b22;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.4);
+}
+</style>
+""", unsafe_allow_html=True)
 
 # -------------------------------
 # Load Model
@@ -17,26 +50,43 @@ def load_model():
 
 model = load_model()
 
-# CIFAR-10 class names
+# -------------------------------
+# Class Names + Emojis
+# -------------------------------
 class_names = [
     'butterfly', 'cat', 'chicken', 'cow', 'dog',
     'elephant', 'horse', 'ragno', 'sheep', 'squirrel'
 ]
 
-# -------------------------------
-# UI
-# -------------------------------
-st.set_page_config(page_title="AI Image Classifier", layout="centered")
-st.title("Multi Class Image Classifier by Debarshi (CNN)")
-st.write("Upload an image and the model will predict its class.")
+emoji_map = {
+    'butterfly': '🦋',
+    'cat': '🐱',
+    'chicken': '🐔',
+    'cow': '🐄',
+    'dog': '🐶',
+    'elephant': '🐘',
+    'horse': '🐴',
+    'ragno': '🕷️',   # spider
+    'sheep': '🐑',
+    'squirrel': '🐿️'
+}
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
+# -------------------------------
+# Header
+# -------------------------------
+st.markdown('<div class="title">🖼️ CNN Image Classifier by Debarshi</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Upload an image and let my AI predict the animal</div>', unsafe_allow_html=True)
+
+# -------------------------------
+# Upload
+# -------------------------------
+uploaded_file = st.file_uploader("📂 Upload Image", type=["jpg", "png", "jpeg"])
 
 # -------------------------------
 # Prediction Function
 # -------------------------------
 def predict(img):
-    img = img.resize((128, 128))  # same as training
+    img = img.resize((128, 128))
     img_array = image.img_to_array(img) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
 
@@ -47,17 +97,34 @@ def predict(img):
     return class_names[predicted_class], confidence, predictions[0]
 
 # -------------------------------
-# Run Prediction
+# Output Section
 # -------------------------------
 if uploaded_file is not None:
     img = Image.open(uploaded_file)
-    st.image(img, caption="Uploaded Image", use_column_width=True)
 
-    label, confidence, probs = predict(img)
+    col1, col2 = st.columns([1, 1])
 
-    st.success(f"Prediction: **{label}**")
-    st.write(f"Confidence: **{confidence*100:.2f}%**")
+    with col1:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.image(img, caption="Uploaded Image", use_column_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    st.subheader("Class Probabilities")
-    for i, class_name in enumerate(class_names):
-        st.write(f"{class_name}: {probs[i]*100:.2f}%")
+    with col2:
+        with st.spinner("Analyzing image..."):
+            label, confidence, probs = predict(img)
+
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+
+        emoji = emoji_map.get(label, "")
+        st.success(f"Prediction: {emoji} {label.capitalize()}")
+        st.metric("Confidence", f"{confidence*100:.2f}%")
+
+        st.subheader("📊 Probability Distribution")
+
+        # Show all classes
+        for i, class_name in enumerate(class_names):
+            emoji = emoji_map.get(class_name, "")
+            st.progress(float(probs[i]))
+            st.caption(f"{emoji} {class_name.capitalize()} — {probs[i]*100:.2f}%")
+
+        st.markdown('</div>', unsafe_allow_html=True)
