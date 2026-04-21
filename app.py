@@ -13,7 +13,7 @@ from PIL import Image
 # -------------------------------
 @st.cache_resource
 def load_model():
-    return tf.keras.models.load_model("model_fast.h5")
+    return tf.keras.models.load_model("model_93.h5")
 
 model = load_model()
 
